@@ -1,0 +1,102 @@
+<form #form="ngForm" (ngSubmit)="save(form)" class="contact-form">
+  <h2>{{ editId ? 'Edit' : 'Add' }} {{ model.type === 'COMMON' ? 'Common' : 'Personal' }} Contact</h2>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+  <p *ngIf="infoMessage" class="info">{{ infoMessage }}</p>
+  <p *ngIf="needsApproval && !infoMessage" class="info">
+    As an employee, changes to common contacts are sent to a manager for approval.
+  </p>
+
+  <label>
+    Name
+    <input
+      type="text"
+      name="name"
+      [(ngModel)]="model.name"
+      required
+      #name="ngModel"
+    />
+    <span class="field-error" *ngIf="name.invalid && name.touched">Name is required</span>
+  </label>
+
+  @if(!editId && !isPersonalUser)
+  {
+  <label>
+    Type
+    <select name="type" [(ngModel)]="model.type">
+      <option value="PERSONAL">Personal</option>
+      <option value="COMMON">Common</option>
+    </select>
+  </label>
+  }
+
+  <fieldset>
+    <legend>Phone numbers <span class="hint">(phone or email is required)</span></legend>
+    @for(p of phoneRows; track i; let i = $index)
+    {<div class="phone-block">
+        <div class="dynamic-row">
+          <select name="phoneLable{{ i }}" [(ngModel)]="p.lable" id="">
+            @for(l of phoneLabels; track l){
+              <option [value] = 'l'>{{ l }}</option>
+            }
+          </select>
+          <select name="phoneCountry{{ i }}" class="country-select" [(ngModel)]="p.country" (ngModelChange)="phoneErrors[i] = ''">
+            @for(c of countryOptions ; track c.code){
+              <option [value] = 'c.code'>{{ c.name }} ({{c.dial}})</option>
+            }
+          </select>
+          <input type="tel" inputmode="numeric" maxlength="15"
+          name="phoneValue{{i}}"
+          [ngModel] = "p.national"
+          (ngModelChange) = "onPhoneInput(p,i,$event)"
+          [placeholder] = "placeholderFor(p)"/>
+          <label class="primary-radio">
+            <input type="radio" name="primaryPhone" [checked] = p.primary (change)="setPrimaryPhone(i)"/>
+            Primary
+          </label>
+          <button type="button" class="remove-btn" (click)="removePhone(i)">X</button>
+        </div>
+        @if(phoneErrors[i]){
+        <span class="field-error">{{phoneErrors[i]}}</span>
+        }
+      </div>
+  }
+  <button type="button" class="add-btn" (click)="addPhone()">+ Add phone</button>
+  </fieldset>
+
+  <fieldset>
+    <legend>Emails <span class="hint">(optional)</span></legend>
+    <div class="dynamic-row" *ngFor="let e of model.emails; let i = index; trackBy: trackByEmail">
+      <select name="emailLable{{ i }}" [(ngModel)]="e.lable">
+        <option *ngFor="let l of emailLabels" [value]="l">{{ l }}</option>
+      </select>
+      <input
+        type="email"
+        name="emailValue{{ i }}"
+        [(ngModel)]="e.email"
+        placeholder="name@example.com"
+      />
+      <label class="primary-radio">
+        <input
+          type="radio"
+          name="primaryEmail"
+          [checked]="e.primary"
+          (change)="setPrimaryEmail(i)"
+        />
+        Primary
+      </label>
+      <button type="button" class="remove-btn" (click)="removeEmail(i)">✕</button>
+    </div>
+    <button type="button" class="add-btn" (click)="addEmail()">+ Add email</button>
+  </fieldset>
+
+  <label>
+    Notes
+    <textarea name="notes" [(ngModel)]="model.notes" rows="3"></textarea>
+  </label>
+
+  <div class="form-actions">
+    <button type="submit" [disabled]="loading">{{ loading ? 'Saving...' : 'Save' }}</button>
+    <button type="button" (click)="cancel()">Cancel</button>
+  </div>
+</form>

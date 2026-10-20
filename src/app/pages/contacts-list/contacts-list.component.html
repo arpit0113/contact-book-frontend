@@ -1,0 +1,75 @@
+<div>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="h5 mb-0">Contacts</h1>
+      <p class="text-muted small mb-0">
+        {{ activeTab === 'PERSONAL' ? 'Only you can see these' : 'Shared with your organization' }}
+      </p>
+    </div>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="exporting()"
+                title="Download all your Personal contacts as a csv file" (click)="exportPersonal()">
+              <i class="bi bi-download"></i>{{exporting()? 'Exporting..' : 'Export Personal'}}
+              </button>
+        <a [routerLink]="['/contacts/add']" [queryParams]="{ type: activeTab }" 
+        title="Add a new contact" class="btn btn-primary btn-sm">+ Add Contact</a>
+    </div>
+    </div>
+
+  <ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="activeTab === 'PERSONAL'" (click)="switchTab('PERSONAL')">Personal</button>
+    </li>
+    @if(!isPersonalUser){
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="activeTab === 'COMMON'" (click)="switchTab('COMMON')">Common</button>
+    </li>
+  }
+  </ul>
+
+  <div class="d-flex gap-2 mb-3">
+    <input [(ngModel)]="search" (ngModelChange)="onSearchChange($event)" class="form-control form-control-sm" placeholder="Search by name, phone or email..." />
+    <select [(ngModel)]="sort" (ngModelChange)="loadContacts()" class="form-select form-select-sm" style="max-width: 200px;">
+      <option value="asc">Name (A-Z)</option>
+      <option value="desc">Name (Z-A)</option>
+    </select>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-danger">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="text-center text-muted py-5">Loading contacts...</div>
+  } @else if (contacts().length === 0 && !error()) {
+    <div class="d-flex flex-column align-items-center justify-content-center text-center py-5">
+      <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+        <i class="bi bi-person-plus fs-3 text-muted"></i>
+      </div>
+      <h2 class="h6 mb-1">No contacts found.</h2>
+      <p class="text-muted small mb-3">{{ search ? 'Try a different search.' : 'Add your first contact.' }}</p>
+      <a [routerLink]="['/contacts/add']" [queryParams]="{ type: activeTab }" class="btn btn-primary btn-sm">+ Add Contact</a>
+    </div>
+  } @else {
+    <p class="text-muted small">{{ contacts().length }} contact(s)</p>
+    <div class="list-group">
+      @for (c of contacts(); track c.id) {
+        <a [routerLink]="['/contacts', c.id]" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fw-medium">{{ c.name }}</div>
+            <div class="text-muted small">
+              @if (primaryPhone(c); as p) { <i class="bi bi-telephone me-1"></i>{{ p.phone }} }
+              @if (primaryEmail(c); as e) { <span class="ms-2"><i class="bi bi-envelope me-1"></i>{{ e.email }}</span> }
+              @if (extraCount(c) > 0) { <span class="badge text-bg-light ms-2">+{{ extraCount(c) }} more</span> }
+            </div>
+          </div>
+          @if (canDelete(c)) {
+            <button class="btn btn-sm btn-outline-danger" (click)="delete($event, c)" title="Delete">
+              <i class="bi bi-trash"></i>
+            </button>
+          }
+        </a>
+      }
+    </div>
+  }
+</div>

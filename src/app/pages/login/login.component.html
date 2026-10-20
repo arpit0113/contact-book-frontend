@@ -1,0 +1,100 @@
+<div class="d-flex align-items-center justify-content-center min-vh-100 bg-light">
+  <div class="card shadow-sm" style="max-width: 720px; width: 100%;">
+    <div class="row g-0">
+      
+      
+      <div class="col-6 d-flex flex-column align-items-center justify-content-center p-5 border-end">
+        <div class="bg-primary bg-opacity-10 rounded-4 d-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+          <i class="bi bi-people-fill fs-3 text-primary"></i>
+        </div>
+        <h1 class="h5 mb-2">Contact Book</h1>
+        <p class="text-muted text-center small">Keep your contacts organized and always within reach.</p>
+      </div>
+
+     
+      <div class="col-6 p-5">
+        
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item">
+            <button class="nav-link active" [class.active] = "mode === 'login'" (click) = "setMode('login')">Login</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link"  [class.active] = "mode === 'signup'" (click) = "setMode('signup')">Sign Up</button>
+          </li>
+        </ul>
+
+        @if(error){
+        <div class="alert alert-danger py-2 small">{{error}}
+          @if(error.includes('rejected')){
+            <a routerLink="/register-organization" class="alert-link">apply again</a>
+          }
+        </div>
+        }
+        @if(success){
+        <div class="alert alert-success py-2 small">{{success}}</div>
+        }
+   
+        <form #loginform="ngForm" (ngSubmit) = "submit(loginform)">
+          
+            @if(mode === "signup"){
+          <div class="mb-3">
+            
+            <input [(ngModel)]="name" name="name" class="form-control" #nameField="ngModel" placeholder="Full name" required />
+          
+         @if(nameField.invalid && nameField.touched){
+            <div class="text-danger small mt-1">
+                name is required
+            </div>
+          }
+        </div>
+         
+        }
+          
+          <div class="mb-3">
+            <input [(ngModel)]="email" #emailField="ngModel" name="email" type="email" class="form-control" placeholder="Email address" required />
+          
+           @if(emailField.invalid && emailField.touched){
+            <div class="text-danger small mt-1">
+                enter a valid email
+            </div>
+          }
+            </div>
+         
+          <div class="mb-3">
+            <div class="input-group">
+             
+              <input [(ngModel)]="password" #passwordField = "ngModel" name="password" [type]="showpassword?'text':'password'" class="form-control" placeholder="Password" required minlength="8" />
+              <button type="button" class="btn btn-outline-secondary" (click)="showpassword = !showpassword">
+                <i class="bi" [class.bi-eye]="!showpassword" [class.bi-eye-slash]="showpassword"></i>
+              </button>
+              @if(passwordField.invalid && passwordField.touched){
+            <div class="text-danger small mt-1">
+                password must be atleast 8 characters
+            </div>
+          }
+            </div>
+          </div>
+
+          
+          <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
+            {{ loading ? 'Please wait...' : (mode === 'login' ? 'Login' : 'Sign Up') }}
+          </button>
+        </form>
+
+        <div class="text-center text-muted small my-3">or</div>
+
+        
+        <button class="btn btn-outline-secondary w-100" (click)="continueWithGoogle()">
+          <i class="bi bi-google me-2"></i>Continue with Google
+        </button>
+
+        <div class="text-center small mt-4 text-muted">
+          Setting up for your company?
+          <a routerLink="/register-organization">Register an organization</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+

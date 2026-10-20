@@ -1,0 +1,63 @@
+<div class="my-requests-page">
+
+  <div class="page-header">
+    <h2>My requests</h2>
+  </div>
+  <p *ngIf="error()" class="error">{{ error() }}</p>
+  <p *ngIf="loading()">Loading...</p>
+  <p *ngIf="!loading() && requests().length === 0">You haven't submitted any requests.</p>
+
+  <ng-container *ngIf="pendingRequests.length">
+    <h3 class="section-title">Awaiting approval</h3>
+    <div class="request-card" *ngFor="let r of pendingRequests">
+      <div class="request-header">
+        <span class="status-badge pending">Pending</span>
+        <span class="action-type">{{ actionLabel(r) }}</span>
+      </div>
+      <h3>{{ r.requestedName }}</h3>
+      <ng-container *ngTemplateOutlet="details; context: { $implicit: r }"></ng-container>
+      <button class="withdraw-btn" [disabled]="cancellingId() === r.id" (click)="cancel(r.id)">
+        Withdraw request
+      </button>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="historyRequests.length">
+    <div class="section-header">
+      <h3 class="section-title">History</h3>
+      <button type="button" class="clear-history-btn"
+              title="Removes these records from your history. Your contacts are not changed."
+              (click)="clearHistory()">
+        <i class="bi bi-clock-history"></i> Clear history ({{ historyRequests.length }})
+      </button>
+    </div>
+    <p class="history-hint">These requests were already decided. Clearing history never changes your contacts.</p>
+    <div class="request-card history" *ngFor="let r of historyRequests">
+      <div class="request-header">
+        <span class="status-badge"
+              [class.approved]="r.status === 'APPROVED'"
+              [class.rejected]="r.status === 'REJECTED'">
+          {{ r.status === 'APPROVED' ? 'Approved' : 'Rejected' }}
+        </span>
+        <span class="action-type">{{ actionLabel(r) }}</span>
+      </div>
+      <h3>{{ r.requestedName }}</h3>
+      <ng-container *ngTemplateOutlet="details; context: { $implicit: r }"></ng-container>
+      <p *ngIf="r.status === 'REJECTED' && r.reviewNote" class="reject-note">Reason: {{ r.reviewNote }}</p>
+      <button class="remove-history-btn" [disabled]="cancellingId() === r.id" (click)="cancel(r.id)">
+        Remove from history
+      </button>
+    </div>
+  </ng-container>
+
+  <ng-template #details let-r>
+    <div class="field-group" *ngIf="r.requestedPhones.length">
+      <strong>Phones:</strong>
+      <span *ngFor="let p of r.requestedPhones" class="chip">{{ p.phone }} ({{ p.lable }})</span>
+    </div>
+    <div class="field-group" *ngIf="r.requestedEmails.length">
+      <strong>Emails:</strong>
+      <span *ngFor="let e of r.requestedEmails" class="chip">{{ e.email }} ({{ e.lable }})</span>
+    </div>
+  </ng-template>
+</div>

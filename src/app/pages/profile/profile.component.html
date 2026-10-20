@@ -1,0 +1,33 @@
+<div class="p-4" style="max-width: 480px;">
+  @if (loading) {
+    <div class="text-center text-muted py-5">Loading...</div>
+  } @else {
+    <div class="card">
+      <div class="card-body">
+        <h1 class="h5 mb-4">Profile</h1>
+
+        @if (error) {
+          <div class="alert alert-danger py-2 small">{{ error }}</div>
+        }
+        @if (success) {
+          <div class="alert alert-success py-2 small">{{ success }}</div>
+        }
+
+        <form #profileForm="ngForm" (ngSubmit)="save(profileForm)">
+          <div class="mb-3">
+            <label class="form-label small required">Name</label>
+            <input [(ngModel)]="model.name" name="name" class="form-control" required />
+          </div>
+          <div class="mb-4">
+            <label class="form-label small required">Email</label>
+            <input [(ngModel)]="model.email" name="email" type="email" class="form-control" required email />
+          </div>
+          <button type="submit" class="btn btn-primary w-100 mb-2" [disabled]="saving">Save Changes</button>
+        </form>
+
+        <hr />
+        <button class="btn btn-outline-danger w-100" (click)="deleteUser()">Delete Account</button>
+      </div>
+    </div>
+  }
+</div>

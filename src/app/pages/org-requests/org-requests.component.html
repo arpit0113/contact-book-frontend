@@ -1,0 +1,26 @@
+<div class="org-requests-page">
+  <h2>Organization Requests</h2>
+  <p class="muted">Email-verified requests waiting for your approval.</p>
+
+  @if (error()) { <p class="error">{{ error() }}</p> }
+  @if (loading()) { <p>Loading...</p> }
+  @if (!loading() && requests().length === 0 && !error()) { <p>No organization requests waiting.</p> }
+
+  @for (r of requests(); track r.id) {
+    <div class="request-card clickable" (click) = "open(r)">
+      <div class="request-header">
+       <h3>{{ r.orgName }}</h3>
+        <span class="domain">{{ r.orgDomain }}</span>
+      </div>
+      <p class="admin">
+        Admin: <strong>{{ r.adminName }}</strong> &lt;{{ r.adminEmail }}&gt;
+      </p>
+      <p class="muted">Requested {{ r.createdAt | date: 'medium' }}</p>
+
+      <div class="request-actions">
+        <button class="approve-btn" [disabled]="actingOnId() === r.id" (click)="approve($event, r)">Approve</button>
+        <button class="reject-btn" [disabled]="actingOnId() === r.id" (click)="reject($event, r)">Reject</button>
+      </div>
+    </div>
+  }
+</div>

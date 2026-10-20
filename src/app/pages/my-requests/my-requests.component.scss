@@ -1,0 +1,144 @@
+.my-requests-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--gap-lg) var(--gap-md);
+}
+
+.request-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--gap-md);
+  margin-bottom: var(--gap-md);
+
+  h3 {
+    margin: 8px 0;
+  }
+}
+
+.request-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+
+  &.pending {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+  }
+
+  &.approved {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+  }
+
+  &.rejected {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+  }
+}
+
+.action-type {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.field-group {
+  margin: 6px 0;
+  font-size: 13px;
+
+  strong {
+    color: var(--color-text-muted);
+    margin-right: 6px;
+  }
+}
+
+.chip {
+  display: inline-block;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 2px 10px;
+  margin: 2px 4px 2px 0;
+  font-size: 12px;
+}
+
+.reject-note {
+  font-size: 13px;
+  color: var(--color-danger);
+  margin: 8px 0;
+}
+
+.remove-history-btn{
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  font-size: 12px;
+  margin-top: var(--gap-sm);
+}
+
+.request-card.history{opacity: 0.85;}
+
+.section-title{
+  margin: var(--gap-md) 0 var(--gap-sm);
+  font-size: 15px;
+  color: var(--color-text-muted);
+}
+
+.section-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--gap-sm);
+}
+
+.history-hint{
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--gap-sm);
+}
+
+
+.page-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--gap-sm);
+  margin-bottom: var(--gap-md);
+  h2{
+    margin: 0;
+  }
+}
+
+
+
+.withdraw-btn{
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  margin-top: var(--gap-sm);
+}
+
+.clear-history-btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  padding: 6px 12px;
+  font-size: 13px;
+
+  &:hover{
+    background: var(--color-surface-alt);
+  }
+}

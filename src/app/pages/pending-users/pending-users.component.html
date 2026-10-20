@@ -1,0 +1,39 @@
+<div class="pending-users-page">
+  <h2>Pending Team Members</h2>
+  <p *ngIf="error()" class="error">{{ error() }}</p>
+  <p *ngIf="loading()">Loading...</p>
+  <p *ngIf="!loading() && users().length === 0">No one is waiting for approval.</p>
+
+  <table *ngIf="!loading() && users().length > 0" class="pending-users-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let u of users()">
+        <td>{{ u.name }}</td>
+        <td>{{ u.email }}</td>
+        <td>
+          <select [(ngModel)]="selectedRole[u.userId]" name="role{{ u.userId }}">
+            <option *ngFor ="let r of roles()" [ngValue]="r.id">{{r.name}}</option>
+          </select>
+        </td>
+        <td>
+          <button [disabled]="approvingId() === u.userId || rejectingId() === u.userId" (click)="approve(u.userId)">
+            Approve
+          </button>
+        </td>
+
+        <td>
+          <button [disabled]="rejectingId() === u.userId || approvingId() === u.userId" (click)="reject(u.userId)">
+            Reject
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

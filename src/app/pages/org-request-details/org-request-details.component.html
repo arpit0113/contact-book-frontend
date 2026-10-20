@@ -1,0 +1,33 @@
+<div class="details-page">
+  <a routerLink="/super-admin/organization-requests" class="back">← Back to requests</a>
+
+  @if (error()) { <p class="error">{{ error() }}</p> }
+  @if (loading()) { <p>Loading...</p> }
+
+  @if (request(); as r) {
+    <div class="card">
+      <div class="title-row">
+        <h2>{{ r.orgName }}</h2>
+        <span class="status" [attr.data-status]="r.status">{{ r.status.replace('_', ' ') }}</span>
+      </div>
+
+      <dl>
+        <dt>Organization name</dt><dd>{{ r.orgName }}</dd>
+        <dt>Email domain</dt><dd>{{ r.orgDomain }}</dd>
+        <dt>Admin name</dt><dd>{{ r.adminName }}</dd>
+        <dt>Admin email</dt><dd>{{ r.adminEmail }}</dd>
+        <dt>Requested on</dt><dd>{{ r.createdAt | date: 'medium' }}</dd>
+        @if (r.reviewNote) { <dt>Review note</dt><dd>{{ r.reviewNote }}</dd> }
+      </dl>
+
+      @if (canReview) {
+        <div class="actions">
+          <button class="approve-btn" [disabled]="acting()" (click)="approve()">Approve</button>
+          <button class="reject-btn" [disabled]="acting()" (click)="reject()">Reject</button>
+        </div>
+      } @else {
+        <p class="muted">This request is no longer waiting for approval.</p>
+      }
+    </div>
+  }
+</div>

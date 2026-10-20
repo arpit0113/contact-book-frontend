@@ -1,0 +1,51 @@
+<div class="contact-import-page">
+  <h2>Import Contacts from CSV</h2>
+
+  <p class="hint">
+    @if(isPersonalUser){
+    Columns: <code>name,phones,emails,notes,type</code> (type is <code>PERSONAL</code>).
+    Put several phones/emails in one cell separated by <code>;</code>, each as
+    <code>label:value</code>, e.g. <code>mobile:+919876543210;work:+929123456780</code> every number must started with its country code and
+    Start an entry with <code>*</code> to mark it as primary (<code>*mobile:+929876543210</code>).
+    Max 5 MB / 5000 rows
+    } @else{
+        Columns: <code>name,phones,emails,notes,type</code> (type is <code>PERSONAL</code> or <code>COMMON</code>).
+    Put several phones/emails in one cell separated by <code>;</code>, each as
+    <code>label:value</code>, e.g. <code>mobile:+919876543210;work:+929123456780</code> every number must started with its country code and
+    Start an entry with <code>*</code> to mark it as primary (<code>*mobile:+929876543210</code>).
+    Max 5 MB / 5000 rows
+    }
+  </p>
+
+  <input type="file" accept=".csv" (change)="onFileSelected($event)" />
+  <button [disabled]="!selectedFile || uploading()" (click)="upload()">
+    {{ uploading() ? 'Encrypting & uploading...' : 'Upload' }}
+  </button>
+
+  <p *ngIf="error()" class="error">{{ error() }}</p>
+
+  <div *ngIf="result() as r" class="import-summary">
+    <h3>Import complete</h3>
+    <ul class="summary-stats">
+      <li>Total rows: {{ r.totalRows }}</li>
+      <li class="ok">Created: {{ r.created }}</li>
+      <li class="pending">Pending approval: {{ r.pendingApproval }}</li>
+      <li class="skipped">Skipped: {{ r.skipped }}</li>
+    </ul>
+
+    <table *ngIf="r.errors.length > 0" class="error-table">
+      <thead>
+        <tr>
+          <th>Row</th>
+          <th>Issue</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let e of r.errors">
+          <td>{{ e.row }}</td>
+          <td>{{ e.message }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

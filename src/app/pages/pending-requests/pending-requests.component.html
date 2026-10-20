@@ -1,0 +1,50 @@
+<div class="pending-requests-page">
+  <h2>Pending Common-Contact Requests</h2>
+  <p *ngIf="error()" class="error">{{ error() }}</p>
+  <p *ngIf="loading()">Loading...</p>
+  <p *ngIf="!loading() && requests().length === 0">Nothing pending right now.</p>
+
+  <div class="request-card" *ngFor="let r of requests()">
+    <div class="request-header">
+      <span class="action-badge" [class.create]="r.actionType === 'CREATE'" [class.update]="r.actionType === 'UPDATE'">
+        {{ r.actionType }}
+      </span>
+      <span class="requested-by">by {{ r.requestedByName }}</span>
+    </div>
+
+    <h3>{{ r.requestedName }}</h3>
+
+    <div class="field-group">
+      <strong>Phones:</strong>
+      <span *ngFor="let p of r.requestedPhones" class="chip">
+        {{ p.phone }} ({{ p.lable }}){{ p.primary ? ' ★' : '' }}
+      </span>
+    </div>
+
+    <div class="field-group">
+      <strong>Emails:</strong>
+      <span *ngFor="let e of r.requestedEmails" class="chip">
+        {{ e.email }} ({{ e.lable }}){{ e.primary ? ' ★' : '' }}
+      </span>
+    </div>
+
+    <p *ngIf="r.requestedNotes" class="notes">{{ r.requestedNotes }}</p>
+
+    <div class="request-actions">
+      <button
+        class="approve-btn"
+        [disabled]="actingOnId() === r.id"
+        (click)="approve(r.id)"
+      >
+        Approve
+      </button>
+      <button
+        class="reject-btn"
+        [disabled]="actingOnId() === r.id"
+        (click)="reject(r.id)"
+      >
+        Reject
+      </button>
+    </div>
+  </div>
+</div>

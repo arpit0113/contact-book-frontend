@@ -1,0 +1,75 @@
+<div class="mx-auto" style="max-width: 820px;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0">Roles</h2>
+    @if (!editing) {
+    <button class="btn btn-primary btn-sm" (click)="newRole()">+ New role</button>
+    }
+  </div>
+
+  @if (error()) { <div class="alert alert-danger py-2">{{ error() }}</div> }
+  @if (loading()) { <p>Loading...</p> }
+
+
+  @if (
+editing) {
+  <div class="card mb-4">
+    <div class="card-body">
+      <h3 class="h6 mb-3">{{ editing.id ? 'Edit role' : 'New role' }}</h3>
+      <div class="mb-3">
+        <label class="form-label small" for="roleName">Name</label>
+        <input id="roleName" class="form-control" [(ngModel)]="editing.name" name="roleName"
+               maxlength="40" [disabled]="editing.systemRole" placeholder="e.g. LEAD" />
+      </div>
+      <div class="mb-3">
+        <div class="form-label small">What can this role do?</div>
+        @for (p of permissions(); track p.code) {
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" [id]="'perm-' + p.code"
+                 [checked]="isChecked(p.code)" (change)="toggle(p.code)" />
+          <label class="form-check-label" [for]="'perm-' + p.code">{{  p.description }}</label>
+        </div>
+        }
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary btn-sm" [disabled]="saving()" (click)="save()">
+          {{ saving() ? 'Saving...' : 'Save' }}
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="cancel()">Cancel</button>
+      </div>
+    </div>
+  </div>
+  }
+
+
+  @for (r of roles(); track r.id) {
+  <div class="card mb-2">
+    <div class="card-body d-flex justify-content-between gap-3">
+      <div>
+        <div class="fw-semibold">
+          {{ r.name }}
+          @if (r.systemRole) { <span class="badge text-bg-light border ms-1">built-in</span> }
+          <span class="text-muted small fw-normal ms-2">
+            {{ r.userCount }} {{ r.userCount === 1 ? 'person' : 'people' }}
+          </span>
+        </div>
+        <div class="mt-1">
+          @for (code of r.permissions; track code) {
+          <span class="badge bg-primary bg-opacity-10 text-primary fw-normal me-1">{{ describe(code) }}</span>
+          }
+          @if (!r.permissions.length) { <span class="text-muted small">No special permissions</span> }
+        </div>
+      </div>
+      <div class="d-flex gap-2 align-items-start">
+        @if (r.name !== 'ADMIN') {
+        <button class="btn btn-outline-secondary btn-sm" (click)="edit(r)">Edit</button>
+        }
+        @if (!r.systemRole) {
+        <button class="btn btn-outline-danger btn-sm" [disabled]="r.userCount > 0"
+                [title]="r.userCount > 0 ? 'Move its people to another role first' : ''"
+                (click)="remove(r)">Delete</button>
+        }
+      </div>
+    </div>
+  </div>
+  }
+</div>
