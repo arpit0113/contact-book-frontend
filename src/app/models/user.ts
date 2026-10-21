@@ -9,4 +9,5 @@ export interface User {
   role: Role | null;
   permissions: string[];
   status: UserStatus;
+  needsApproval: boolean;
 }

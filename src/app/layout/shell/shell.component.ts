@@ -37,6 +37,7 @@ export class ShellComponent implements OnInit {
   get needsApproval() {return this.authservice.needsApproval();}
   get canApproveUsers(){return this.authservice.hasPermission('USER_APPROVE');}
   get canManageRoles(){return this.authservice.hasPermission('ROLE_MANAGE');}
+  get canManageWorkflows(){return this.authservice.hasPermission('WORKFLOW_MANAGE');}
   
   logout() {
     this.authservice.logout();

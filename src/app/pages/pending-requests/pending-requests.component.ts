@@ -3,10 +3,10 @@ import { Component, signal } from '@angular/core';
 import { ContactChangeRequest } from '../../models/contact-request-dto';
 import { ContactService } from '../../services/contact.service';
 import { apiError } from '../../utils/api-error';
-
+import { RequestProgressComponent } from '../request-progress/request-progress.component';
 @Component({
   selector: 'app-pending-requests',
-  imports: [CommonModule],
+  imports: [CommonModule, RequestProgressComponent],
   templateUrl: './pending-requests.component.html',
   styleUrl: './pending-requests.component.scss',
 })

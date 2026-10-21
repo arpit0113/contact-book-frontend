@@ -42,6 +42,7 @@
         <span class="action-type">{{ actionLabel(r) }}</span>
       </div>
       <h3>{{ r.requestedName }}</h3>
+       <app-request-progress [request] ="r"></app-request-progress>
       <ng-container *ngTemplateOutlet="details; context: { $implicit: r }"></ng-container>
       <p *ngIf="r.status === 'REJECTED' && r.reviewNote" class="reject-note">Reason: {{ r.reviewNote }}</p>
       <button class="remove-history-btn" [disabled]="cancellingId() === r.id" (click)="cancel(r.id)">

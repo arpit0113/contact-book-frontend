@@ -39,6 +39,11 @@
                 <i class="bi bi-shield-lock"></i> Roles
             </a>
             }
+             @if (canManageWorkflows) {
+            <a routerLink="/workflows" routerLinkActive="bg-primary bg-opacity-10 fw-semibold" class="nav-link text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-diagram-3"></i> Approval Flows
+            </a>
+            }
             @if (isSuperAdmin) {
             <a routerLink="/super-admin/organization-requests" routerLinkActive="bg-primary bg-opacity-10 fw-semibold" class="nav-link text-dark d-flex align-items-center gap-2">
                 <i class="bi bi-building-check"></i> Organization Requests

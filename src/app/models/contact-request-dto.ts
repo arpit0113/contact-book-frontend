@@ -30,4 +30,14 @@ export interface ContactChangeRequest {
     status : RequestStatus;
     requestedByName : string;
     reviewNote : string | null ;
+    workflowName?: string | null;
+    mode?: 'SEQUENTIAL' | 'ANY_ONE' | null;
+    currentStep?: number | null;
+    totalSteps?: number| null;
+    waitingFor?: string | null;
+    steps?: {
+        order: number;
+        roleName: string;
+        state: 'DONE' | 'CURRENT' | 'UPCOMING' | 'REJECTED'
+    }[];
 }

@@ -17,6 +17,7 @@ const ACCESS_TOKEN = 'accessToken';
 const REFRESH_TOKEN = 'refreshToken';
 const ROLE = 'role';
 const PERMISSIONS ='permissions';
+const NEEDS_APPROVAL = 'needsApproval'
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -35,8 +36,9 @@ export class AuthService {
       tap((res) => {
         if (res.status === 'ACTIVE' && res.accesstoken && res.refreshToken) {
           this.storeTokens({ accessToken: res.accesstoken, refreshToken: res.refreshToken });
-          if (res.user?.role) this.setRole(res.user.role);
-          this.setPermission(res.user?.permissions ?? []);
+         if(res.user){
+          this.cacheProfile(res.user);
+         }
         }
       })
     );
@@ -52,8 +54,7 @@ export class AuthService {
   loadProfile(): Observable<User> {
     return this.http.get<User>(ME_URL).pipe(
       tap((user) => {
-        if (user.role) this.setRole(user.role);
-        this.setPermission(user.permissions ?? []);
+        this.cacheProfile(user)
       })
     );
   }
@@ -105,11 +106,18 @@ export class AuthService {
     if (tokens.refreshToken) localStorage.setItem(REFRESH_TOKEN, tokens.refreshToken);
   }
 
+  private cacheProfile(user: User): void {
+  if (user.role) this.setRole(user.role);
+  this.setPermission(user.permissions ?? []);
+  localStorage.setItem(NEEDS_APPROVAL, String(!!user.needsApproval));
+}
+
   private clearTokens(): void {
     localStorage.removeItem(ACCESS_TOKEN);
     localStorage.removeItem(REFRESH_TOKEN);
     localStorage.removeItem(ROLE);
     localStorage.removeItem(PERMISSIONS);
+    localStorage.removeItem(NEEDS_APPROVAL);
   }
 
   getAccessToken(): string | null { 
@@ -173,6 +181,6 @@ export class AuthService {
   }
 
   needsApproval(): boolean{
-    return this.isOrgMember() && !this.canEditCommonDirectly();
+    return this.isOrgMember() && localStorage.getItem(NEEDS_APPROVAL) === 'true';
   }
 }

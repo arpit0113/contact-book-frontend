@@ -16,6 +16,7 @@ import { RegisterOrganizationComponent } from './pages/register-organization/reg
 import { OrgRequestsComponent } from './pages/org-requests/org-requests.component';
 import { OrgRequestDetailsComponent } from './pages/org-request-details/org-request-details.component';
 import { RolesComponent } from './pages/roles/roles.component';
+import { WorkflowsComponent } from './pages/workflows/workflows.component';
 
 
 
@@ -52,6 +53,7 @@ export const routes: Routes = [
 
       {path: 'roles', component : RolesComponent , canActivate: [permissionGuard('ROLE_MANAGE')]},
 
+      {path : 'workflows', component : WorkflowsComponent, canActivate: [permissionGuard('WORKFLOW_MANAGE')]},
       // super admin
       { path: 'super-admin/organization-requests', component: OrgRequestsComponent, canActivate: [roleGuard(['SUPER_ADMIN'])] },
       {path: 'super-admin/organization-requests/:id', component: OrgRequestDetailsComponent, canActivate : [roleGuard(['SUPER_ADMIN'])]},

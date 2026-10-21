@@ -4,10 +4,11 @@ import { ContactChangeRequest } from '../../models/contact-request-dto';
 import { ContactService } from '../../services/contact.service';
 import { apiError } from '../../utils/api-error';
 import { forkJoin } from 'rxjs';
+import { RequestProgressComponent } from '../request-progress/request-progress.component';
 
 @Component({
   selector: 'app-my-requests',
-  imports: [CommonModule],
+  imports: [CommonModule, RequestProgressComponent],
   templateUrl: './my-requests.component.html',
   styleUrl: './my-requests.component.scss',
 })

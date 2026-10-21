@@ -1,0 +1,135 @@
+<div class="mx-auto" style="max-width: 860px;">
+  <div class="d-flex justify-content-between align-items-center mb-1">
+    <h2 class="h4 mb-0">Approval flows</h2>
+    @if (!editing) {
+    <button class="btn btn-primary btn-sm" (click)="newFlow()">+ New flow</button>
+    }
+  </div>
+  <p class="text-muted small">
+    A flow says who must approve a change to a common contact. An organization admin can always approve and finish a request.
+  </p>
+
+
+  @if (error()) { <div class="alert alert-danger py-2">{{ error() }}</div> }
+  @if (loading()) { <p>Loading...</p> }
+
+
+  @if (editing) {
+  <div class="card mb-4">
+    <div class="card-body">
+      <h3 class="h6 mb-3">{{ editing.id ? 'Edit flow' : 'New flow' }}</h3>
+
+
+      <div class="mb-3">
+        <label class="form-label small" for="flowName">Name</label>
+        <input id="flowName" class="form-control" [(ngModel)]="editing.name" maxlength="60" placeholder="e.g. Three-level" />
+      </div>
+
+
+      <div class="mb-3">
+        <div class="form-label small">How should approval work?</div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" id="mode-seq" name="flowMode" value="SEQUENTIAL" [(ngModel)]="editing.mode" />
+          <label class="form-check-label" for="mode-seq">
+            Everyone in order <span class="text-muted">(each step must approve before the next one)</span>
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" id="mode-any" name="flowMode" value="ANY_ONE" [(ngModel)]="editing.mode" />
+          <label class="form-check-label" for="mode-any">
+            Any one of them <span class="text-muted">(the first approval finishes it)</span>
+          </label>
+        </div>
+      </div>
+
+
+      <div class="mb-3">
+        <div class="form-label small">{{ editing.mode === 'SEQUENTIAL' ? 'Steps, in order' : 'Who can approve' }}</div>
+        @for (id of editing.roleIds; track $index; let i = $index) {
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="text-muted small" style="width: 56px;">
+            {{ editing.mode === 'SEQUENTIAL' ? 'Step ' + (i + 1) : 'Role' }}
+          </span>
+          <select class="form-select form-select-sm" [(ngModel)]="editing.roleIds[i]">
+            <option [ngValue]="null">Choose a role...</option>
+            @for (r of approverRoles; track r.id) {
+            <option [ngValue]="r.id">{{ r.name }}</option>
+            }
+          </select>
+          @if (editing.mode === 'SEQUENTIAL') {
+          <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="i === 0" (click)="moveStep(i, -1)">↑</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="i === editing.roleIds.length - 1" (click)="moveStep(i, 1)">↓</button>
+          }
+          <button type="button" class="btn btn-outline-danger btn-sm" [disabled]="editing.roleIds.length === 1" (click)="removeStep(i)">✕</button>
+        </div>
+        }
+        <button type="button" class="btn btn-outline-primary btn-sm" (click)="addStep()">
+          + {{ editing.mode === 'SEQUENTIAL' ? 'Add step' : 'Add role' }}
+        </button>
+        <div class="text-muted small mt-2">Only roles that can review requests are listed.</div>
+      </div>
+
+
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary btn-sm" [disabled]="saving()" (click)="save()">{{ saving() ? 'Saving...' : 'Save' }}</button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="cancel()">Cancel</button>
+      </div>
+    </div>
+  </div>
+  }
+
+
+  @for (w of workflows(); track w.id) {
+  <div class="card mb-2">
+    <div class="card-body d-flex justify-content-between gap-3">
+      <div>
+        <div class="fw-semibold">
+          {{ w.name }}
+          @if (w.pendingCount > 0) {
+          <span class="badge text-bg-warning fw-normal ms-2">{{ w.pendingCount }} waiting</span>
+          }
+        </div>
+        <div class="text-muted small">{{ summary(w) }}</div>
+      </div>
+      <div class="d-flex gap-2 align-items-start">
+        <button class="btn btn-outline-secondary btn-sm" (click)="edit(w)">Edit</button>
+        <button class="btn btn-outline-danger btn-sm" (click)="remove(w)">Delete</button>
+      </div>
+    </div>
+  </div>
+  }
+
+  <h3 class="h5 mt-5 mb-1">Who needs approval?</h3>
+  <p class="text-muted small">
+    Choose which flow each role's changes to common contacts must follow. The ADMIN role never needs approval.
+  </p>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Role</th>
+          @for (a of actions; track a.value) { <th>{{ a.label }}</th> }
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of requesterRoles; track r.id) {
+        <tr>
+          <td class="fw-semibold">{{ r.name }}</td>
+          @for (a of actions; track a.value) {
+          <td>
+            <select class="form-select form-select-sm"
+                    [ngModel]="policyFor(r.id, a.value)"
+                    (ngModelChange)="onPolicyChange(r, a.value, $event)">
+              <option [ngValue]="null">{{ noneLabel(r) }}</option>
+              @for (w of workflows(); track w.id) {
+              <option [ngValue]="w.id">{{ w.name }}</option>
+              }
+            </select>
+          </td>
+          }
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
