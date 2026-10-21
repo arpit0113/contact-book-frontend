@@ -51,7 +51,7 @@
       <a [routerLink]="['/contacts/add']" [queryParams]="{ type: activeTab }" class="btn btn-primary btn-sm">+ Add Contact</a>
     </div>
   } @else {
-    <p class="text-muted small">{{ contacts().length }} contact(s)</p>
+    <p class="text-muted small">{{ contacts().length}} {{hasMore() ? '+' : ''}} contact(s)</p>
     <div class="list-group">
       @for (c of contacts(); track c.id) {
         <a [routerLink]="['/contacts', c.id]" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
@@ -71,5 +71,18 @@
         </a>
       }
     </div>
+    @if(hasMore()){
+      <div #sentinel class = "text-center text-muted small py-3">
+        {{loadingMore() ? 'Loading more...' : ''}}
+      </div>
+    }
+  }
+  @if(showTop()){
+    <button type="button" class="btn btn-primary rounded-circle shadow position-fixed d-flex align-items-center justify-content-center"
+            style="bottom: 24px; right: 24px; width: 44px; height: 44px; z-index: 20;"
+            title="Back to top"
+            (click)="scrollToTop()">
+       <i class="bi bi-arrow-up"></i>   
+    </button>
   }
 </div>

@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, from, switchMap } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Contact, ContactType } from '../models/contact';
+import { Contact,ContactPage, ContactType } from '../models/contact';
 import { ContactChangeRequest, ContactRequestDTO, ContactWriteResultDTO } from '../models/contact-request-dto';
 import { CryptoService } from './crypto.service';
 
@@ -28,6 +28,16 @@ export class ContactService {
     if (type) params = params.set('type', type);
     if (search?.trim()) params = params.set('search', search.trim());
     return this.http.get<Contact[]>(API_URL, { params });
+  }
+
+  getPage(type: ContactType | undefined, search: string, sort: 'asc' | 'desc' = 'asc' , page:number, size = 20): Observable<ContactPage> {
+    let params = new HttpParams()
+    .set('sort', `name,${sort}`)
+    .set('page', page)
+    .set('size', size);
+    if (type) params = params.set('type', type);
+    if (search?.trim()) params = params.set('search', search.trim());
+    return this.http.get<ContactPage>(`${API_URL}/paged`, { params });
   }
 
   getById(id: number): Observable<Contact> {

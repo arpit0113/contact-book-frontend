@@ -11,3 +11,10 @@ export interface Contact {
     userId:number;
     type: ContactType;
 }
+
+export interface ContactPage{
+    content : Contact[];
+    page: number;
+    size: number;
+    hasMore:boolean;
+}
