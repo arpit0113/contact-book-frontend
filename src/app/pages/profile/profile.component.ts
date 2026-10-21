@@ -54,12 +54,6 @@ export class ProfileComponent {
   this.userservice.updateUser(this.model).subscribe({
     next : () => {
       this.saving = false;
-      if (this.model.email !== this.originalEmail) {
-        // access tokens are issued for the old email address, so sign in again
-        alert('Email changed. Please sign in again with your new email.');
-        this.authservice.forceLogout();
-        return;
-      }
       this.success = 'Profile updated';
     },
     error : (err) => {

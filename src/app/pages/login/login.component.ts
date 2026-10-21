@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { homeFor } from '../../guards/role.gurad';
+import { homeFor } from '../../guards/role.guard';
 import { apiError } from '../../utils/api-error';
 
 // ?error=... values set by OauthSuccessHandler on the backend
@@ -58,7 +58,7 @@ export class LoginComponent implements OnInit {
 
     if (this.mode === 'login') {
       this.authservice.login({ email: this.email, password: this.password }).subscribe({
-        next: (user) => this.router.navigate([homeFor(user.role)]),
+        next: (user) => this.router.navigate([homeFor(user.accountType)]),
         error: (err) => {
           this.error = apiError(err, 'Email or password is invalid');
           this.loading = false;

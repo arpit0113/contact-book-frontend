@@ -20,7 +20,7 @@
           </div>
           <div class="mb-4">
             <label class="form-label small required">Email</label>
-            <input [(ngModel)]="model.email" name="email" type="email" class="form-control" required email />
+            <input [(ngModel)]="model.email" name="email" readonly type="email" class="form-control" required email />
           </div>
           <button type="submit" class="btn btn-primary w-100 mb-2" [disabled]="saving">Save Changes</button>
         </form>

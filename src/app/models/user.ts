@@ -1,5 +1,6 @@
 export type Role = string;
 export type UserStatus = 'ACTIVE' | 'PENDING';
+export type AccountType = 'SUPER_ADMIN' | 'PERSONAL' | 'ORG_MEMBER';
 
 export interface User {
   id: number;
@@ -10,4 +11,5 @@ export interface User {
   permissions: string[];
   status: UserStatus;
   needsApproval: boolean;
+  accountType: AccountType;
 }

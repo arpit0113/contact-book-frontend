@@ -7,7 +7,7 @@ import {
   AuthResponse, LoginRequest, OrgCreationRequest, OrgCreationResponse,
   OtpVerifyRequest, ResendOtpRequest, SignUpRequest, TokenPair,
 } from '../models/auth';
-import { Role, User } from '../models/user';
+import { AccountType, Role, User } from '../models/user';
 
 const USER_AUTH_URL = `${environment.API}/api/auth/user`;
 const ORG_AUTH_URL = `${environment.API}/api/auth/organizations`;
@@ -17,7 +17,8 @@ const ACCESS_TOKEN = 'accessToken';
 const REFRESH_TOKEN = 'refreshToken';
 const ROLE = 'role';
 const PERMISSIONS ='permissions';
-const NEEDS_APPROVAL = 'needsApproval'
+const NEEDS_APPROVAL = 'needsApproval';
+const ACCOUNT_TYPE = 'accountType';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -108,6 +109,7 @@ export class AuthService {
 
   private cacheProfile(user: User): void {
   if (user.role) this.setRole(user.role);
+  localStorage.setItem(ACCOUNT_TYPE, user.accountType);
   this.setPermission(user.permissions ?? []);
   localStorage.setItem(NEEDS_APPROVAL, String(!!user.needsApproval));
 }
@@ -118,6 +120,7 @@ export class AuthService {
     localStorage.removeItem(ROLE);
     localStorage.removeItem(PERMISSIONS);
     localStorage.removeItem(NEEDS_APPROVAL);
+    localStorage.removeItem(ACCOUNT_TYPE);
   }
 
   getAccessToken(): string | null { 
@@ -161,19 +164,25 @@ export class AuthService {
     const current = this.getRole();
     return current != null && roles.includes(current);
   }
+  getAccountType(): AccountType | null{
+    return localStorage.getItem(ACCOUNT_TYPE) as AccountType | null ;
+  }
+
+  isPersonalAccount(): boolean{
+    return this.getAccountType() === 'PERSONAL';
+  }
 
   isSuperAdmin(): boolean { 
-    return this.getRole() === 'SUPER_ADMIN';
+    return this.getAccountType() === 'SUPER_ADMIN';
   }
 
   canUseContacts(): boolean {
-    const r =  this.getRole();
-    return r != null && r !== 'SUPER_ADMIN';
+    const acType =  this.getAccountType();
+    return acType != null && acType !== 'SUPER_ADMIN';
   }
 
   isOrgMember(): boolean{
-        const r =  this.getRole();
-    return r != null && r !== 'SUPER_ADMIN' && r !== 'USER';
+    return this.getAccountType() === 'ORG_MEMBER';
   }
 
   canEditCommonDirectly() : boolean{

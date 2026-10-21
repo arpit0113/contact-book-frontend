@@ -5,7 +5,7 @@ import { ContactsListComponent } from './pages/contacts-list/contacts-list.compo
 import { ContactFormComponent } from './pages/contact-form/contact-form.component';
 import { ContactDetailsComponent } from './pages/contact-details/contact-details.component';
 import { authGuard } from './guards/auth.guard';
-import { homeGuard, roleGuard, contactGuard, permissionGuard, myRequestsGuard } from './guards/role.gurad';
+import { homeGuard, contactGuard, permissionGuard, myRequestsGuard, superAdminGuard } from './guards/role.guard';
 import { OauthSuccessComponent } from './pages/oauth-success/oauth-success.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { ContactImportComponent } from './pages/contact-import/contact-import.component';
@@ -55,8 +55,8 @@ export const routes: Routes = [
 
       {path : 'workflows', component : WorkflowsComponent, canActivate: [permissionGuard('WORKFLOW_MANAGE')]},
       // super admin
-      { path: 'super-admin/organization-requests', component: OrgRequestsComponent, canActivate: [roleGuard(['SUPER_ADMIN'])] },
-      {path: 'super-admin/organization-requests/:id', component: OrgRequestDetailsComponent, canActivate : [roleGuard(['SUPER_ADMIN'])]},
+      { path: 'super-admin/organization-requests', component: OrgRequestsComponent, canActivate: [superAdminGuard] },
+      {path: 'super-admin/organization-requests/:id', component: OrgRequestDetailsComponent, canActivate : [superAdminGuard]},
     ],
   },
 
