@@ -2,17 +2,26 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { catchError, map, of } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { KeycloakService } from '../services/keycloak.service';
+import { accessReason } from '../utils/access-error';
 
 
 export function homeFor(accountType: string | null): string {
   return accountType === 'SUPER_ADMIN' ? '/super-admin/organization-requests' : '/contacts';
 }
 
+function accessPage(router: Router, err: any) {
+  return router.createUrlTree(['/access'], { queryParams: { reason: accessReason(err) ?? 'error' } });
+}
 
 export const homeGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
-  if (!auth.isLoggedIn()) return router.createUrlTree(['/login']);
+  const keycloak = inject(KeycloakService);
+  if (!auth.isLoggedIn()) {
+    keycloak.login();
+    return false;
+  }
 
 
   const cached = auth.getAccountType();
@@ -21,7 +30,7 @@ export const homeGuard: CanActivateFn = () => {
 
   return auth.loadProfile().pipe(
     map((user) => router.createUrlTree([homeFor(user.accountType)])),
-    catchError(() => of(router.createUrlTree(['/login'])))
+    catchError((err) => of(accessPage(router, err)))
   );
 };
 
@@ -38,7 +47,7 @@ function check(allow: (auth: AuthService) => boolean): CanActivateFn {
 
     return auth.loadProfile().pipe(
       map(() => decide()),
-      catchError(() => of(router.createUrlTree(['/login'])))
+      catchError((err) => of(accessPage(router, err)))
     );
   };
 }

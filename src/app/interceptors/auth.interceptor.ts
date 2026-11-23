@@ -1,53 +1,45 @@
-import { HttpErrorResponse, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
+import { HttpErrorResponse, HttpEvent, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Observable, catchError, finalize, map, shareReplay, switchMap, throwError } from 'rxjs';
-import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
+import { Observable, catchError, from, switchMap, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { KeycloakService } from '../services/keycloak.service';
+import { accessReason } from '../utils/access-error';
 
-function addAuthHeader(req: HttpRequest<unknown>, token: string | null) {
-  if (!token) return req;
-  return req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
+function withToken(req: HttpRequest<unknown>, token: string | null) {
+  return token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req;
 }
 
-function isAuthEndpoint(url: string): boolean {
-  return url.includes('/api/auth/');
-}
 
-
-let refreshInFlight$: Observable<string> | null = null;
-
-function refreshOnce(auth: AuthService): Observable<string> {
-  if (!refreshInFlight$) {
-    refreshInFlight$ = auth.refresh().pipe(
-      map((tokens) => tokens.accessToken),
-      finalize(() => (refreshInFlight$ = null)),
-      shareReplay(1)
-    );
-  }
-  return refreshInFlight$;
+function skipAuth(url: string): boolean {
+  return !url.startsWith(environment.API) || url.includes('/api/auth/');
 }
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const authService = inject(AuthService);
-  const authReq = isAuthEndpoint(req.url) ? req : addAuthHeader(req, authService.getAccessToken());
+  if (skipAuth(req.url)) return next(req);
 
-  return next(authReq).pipe(
-    catchError((err: HttpErrorResponse) => {
-      if (err.status !== 401 || isAuthEndpoint(req.url)) {
-        return throwError(() => err);
-      }
-      if (!authService.getRefreshToken()) {
-        authService.forceLogout();
-        return throwError(() => err);
-      }
+  const keycloak = inject(KeycloakService);
+  const router = inject(Router);
 
-      return refreshOnce(authService).pipe(
-        catchError((refreshError: HttpErrorResponse) => {
-          const serverDown = refreshError.status === 0 || refreshError.status >= 500;
-          if (!serverDown) authService.forceLogout();
-          return throwError(() => refreshError);
-        }),
-        switchMap((newToken) => next(addAuthHeader(req, newToken)))
-      );
-    })
-  );
+  const send = (isRetry: boolean): Observable<HttpEvent<unknown>> =>
+    from(isRetry ? keycloak.forceRefresh() : keycloak.getValidToken()).pipe(
+      switchMap((token) => next(withToken(req, token))),
+      catchError((err: HttpErrorResponse) => {
+        if (err.status === 401) {
+          if (!keycloak.authenticated) {
+            keycloak.login();                      
+          } else if (!isRetry) {
+            return send(true);                      
+          } else {
+            
+            router.navigate(['/access'], { queryParams: { reason: 'unauthorized' } });
+          }
+        }
+        const reason = accessReason(err);
+        if (reason) router.navigate(['/access'], { queryParams: { reason } });
+        return throwError(() => err);
+      })
+    );
+
+  return send(false);
 };

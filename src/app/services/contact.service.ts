@@ -3,11 +3,10 @@ import { Injectable } from '@angular/core';
 import { Observable, from, switchMap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Contact,ContactPage, ContactType } from '../models/contact';
-import { ContactChangeRequest, ContactRequestDTO, ContactWriteResultDTO } from '../models/contact-request-dto';
+import { ContactChangeRequest, ContactCount, ContactRequestDTO, ContactWriteResultDTO } from '../models/contact-request-dto';
 import { CryptoService } from './crypto.service';
 
 const API_URL = `${environment.API}/api/contacts`;
-// backend: @RequestMapping("/api/contact-requests")
 const REQUESTS_URL = `${environment.API}/api/contact-requests`;
 
 export interface BulkImportRowError { row: number; message: string; }
@@ -42,6 +41,10 @@ export class ContactService {
 
   getById(id: number): Observable<Contact> {
     return this.http.get<Contact>(`${API_URL}/${id}`);
+  }
+
+  getContactCount():Observable<ContactCount>{
+    return this.http.get<ContactCount>(`${API_URL}/count`)
   }
 
   addContact(dto: ContactRequestDTO): Observable<ContactWriteResultDTO> {
