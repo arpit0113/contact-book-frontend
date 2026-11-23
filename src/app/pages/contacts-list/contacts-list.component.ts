@@ -9,6 +9,7 @@ import { AuthService } from '../../services/auth.service';
 import { ContactService } from '../../services/contact.service';
 import { apiError } from '../../utils/api-error';
 import { contactsToCsv, downloadCsv } from '../../utils/contact-csv';
+import { ContactCount } from '../../models/contact-request-dto';
 
 
 @Component({
@@ -19,6 +20,7 @@ import { contactsToCsv, downloadCsv } from '../../utils/contact-csv';
 })
 export class ContactsListComponent implements OnInit, OnDestroy {
   contacts = signal<Contact[]>([]);
+  count = signal(0);
   loading = signal(true);
   error = signal('');
   exporting = signal(false);
@@ -78,6 +80,7 @@ export class ContactsListComponent implements OnInit, OnDestroy {
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe(() => this.loadContacts());
     this.loadContacts();
+    this.Contactcount();
   }
 
   ngOnDestroy() {
@@ -136,6 +139,18 @@ export class ContactsListComponent implements OnInit, OnDestroy {
         this.loading.set(false);
       },
     });
+  }
+
+  Contactcount(){
+    return this.contactService.getContactCount().subscribe({
+      next : (data) => {this.count.set(data.count);
+      },
+
+      error : (err) => {
+        this.error.set(apiError(err, 'Cannot count contacts'));
+      },
+
+    })
   }
 
   loadMore() {
@@ -201,7 +216,9 @@ scrollToTop(){
     event.stopPropagation();
     if (!window.confirm(`Delete "${contact.name}"?`)) return;
     this.contactService.deleteContact(contact.id).subscribe({
-      next: () => this.contacts.set(this.contacts().filter((c) => c.id !== contact.id)),
+      next: () =>{ this.contacts.set(this.contacts().filter((c) => c.id !== contact.id))
+          this.Contactcount();
+      },
       error: (err) => this.error.set(apiError(err, 'Failed to delete')),
     });
   }

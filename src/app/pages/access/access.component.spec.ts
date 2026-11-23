@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OauthSuccessComponent } from './oauth-success.component';
+import { AccessComponent } from './access.component';
 
-describe('OauthSuccessComponent', () => {
-  let component: OauthSuccessComponent;
-  let fixture: ComponentFixture<OauthSuccessComponent>;
+describe('AccessComponent', () => {
+  let component: AccessComponent;
+  let fixture: ComponentFixture<AccessComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [OauthSuccessComponent]
+      imports: [AccessComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(OauthSuccessComponent);
+    fixture = TestBed.createComponent(AccessComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -51,7 +51,7 @@
       <a [routerLink]="['/contacts/add']" [queryParams]="{ type: activeTab }" class="btn btn-primary btn-sm">+ Add Contact</a>
     </div>
   } @else {
-    <p class="text-muted small">{{ contacts().length}} {{hasMore() ? '+' : ''}} contact(s)</p>
+    <p class="text-muted small">Total :- {{count()}} contact(s)</p>
     <div class="list-group">
       @for (c of contacts(); track c.id) {
         <a [routerLink]="['/contacts', c.id]" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">

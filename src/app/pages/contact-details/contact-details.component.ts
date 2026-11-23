@@ -25,7 +25,12 @@ export class ContactDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    const idParam = this.route.snapshot.paramMap.get('id');
+    const id = Number(idParam);
+    if (!idParam || Number.isNaN(id)) {
+  this.router.navigate(['/contacts']);
+  return;
+}
     this.contactService.getById(id).subscribe({
       next: (data) => {
         this.contact = data;

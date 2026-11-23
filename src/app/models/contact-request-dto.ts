@@ -41,3 +41,8 @@ export interface ContactChangeRequest {
         state: 'DONE' | 'CURRENT' | 'UPCOMING' | 'REJECTED'
     }[];
 }
+
+
+export interface ContactCount{
+    count: number;
+}

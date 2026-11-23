@@ -3,6 +3,7 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { apiError } from '../../utils/api-error';
+import { KeycloakService } from '../../services/keycloak.service';
 
 type Step = 'details' | 'otp' | 'done';
 const PENDING_KEY = 'pendingOrgReuqest';
@@ -24,15 +25,16 @@ export class RegisterOrganizationComponent implements OnDestroy {
 
   adminName = '';
   adminEmail = '';
-  password = '';
   orgName = '';
   otp = '';
-  showPassword = false;
 
   private requestId: number | null = null;
   private timer?: ReturnType<typeof setInterval>;
 
-  constructor(private auth: AuthService) {}
+  constructor(private auth: AuthService, private keycloak: KeycloakService) {}
+
+  get loggedIn() { return this.keycloak.authenticated; }
+  signOut() { this.keycloak.logout(); }
 
   ngOnInit(){
     try{
@@ -78,7 +80,6 @@ export class RegisterOrganizationComponent implements OnDestroy {
       .requestOrganization({
         adminName: this.adminName,
         adminEmail: this.adminEmail,
-        password: this.password,
         orgName: this.orgName.trim() || undefined,
       })
       .subscribe({
